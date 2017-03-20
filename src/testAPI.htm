@@ -1,0 +1,229 @@
+
+<!-- saved from url=(0032)ftp://10.240.135.12/testAPI.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="cache-control" content="max-age=0">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+
+<script>
+(function() {
+  var TestAPI = function() {};
+  // common
+  TestAPI.prototype.alert = function(text) {
+    window.appHost.invoke('alert', {'text':text});
+  };
+
+  TestAPI.prototype.toast = function(text) {
+    window.appHost.invoke('toast', {'text':text});
+  };
+
+  TestAPI.prototype.openUrl = function(url) {
+    window.appHost.invoke('openUrl', {'url':url});
+  };
+
+  TestAPI.prototype.getReceiveDate = function(cb) {
+    window.appHost.invoke('getReceiveDate', {}, cb);
+  };
+
+  TestAPI.prototype.getBaseInfo = function(cb) {
+    window.appHost.invoke('getBaseInfo', {}, cb);
+  };
+
+
+
+  TestAPI.prototype.confirm = function(content, title, positiveText, negativeText, cb) {
+    window.appHost.invoke('confirm', {
+      'content' : content,
+      'title' : title,
+      'nagativeText' : negativeText,      // 注意API的文档和实现上这里就是错别字，所以只能这样写
+      'positiveText' : positiveText
+    }, cb);
+  };
+
+  TestAPI.prototype.copyToPasteboard = function(text, cb) {
+    window.appHost.inovke('copyToPasteboard', {'text':text}, cb);
+  }
+
+  // Navigation
+  TestAPI.prototype.startNewPage = function(url, title, type) {
+    window.appHost.invoke('startNewPage', {'url':url, 'title':title, 'type':type}); }
+
+  // Share
+  TestAPI.prototype.share = function(content, title, url, imageUrl, cb) {
+    window.appHost.invoke('share', {
+      'default' : {
+        'shareTitle': title,
+        'shareContent':content,
+        'shareUrl': url,
+        'thumbUrl': imageUrl
+      }, 'list': [
+        {'type' : 'WeiXinFriend'},
+        {'type' : 'WeiXinTimeline'},
+        {'type' : 'WeiBo', "data": {"shareTitle":title, "shareContent" : content + "http://www.baidu.com", "shareUrl":url,  'thumbUrl': imageUrl}},
+        {'type' : 'QQFriend'},
+        {'type' : 'QQZone'},
+        {'type' : 'YiXinFriend'},
+        {'type' : 'YiXinTimeline'},
+        {'type' : 'Mail'},
+        {'type' : 'Message'},
+        {'type' : 'Copy'}
+      ]
+    },cb);
+  };
+
+  TestAPI.prototype.sendMessage = function(content, telNumber, cb) {
+    window.appHost.invoke('sendMessage', {'content':content, 'telNumber':telNumber}, cb);
+  };
+
+  // Read: lanchActivity
+  TestAPI.prototype.launchActivity = function(url, title) {
+    window.appHost.invoke('launchActivitiy', {'url':url, 'title': 'title', 'type': 'push'});
+  };
+
+  TestAPI.prototype.getAccounts = function(cb) {
+    window.appHost.invoke('getAccounts',{"type":"NetEase"}, cb)
+  };
+
+  TestAPI.prototype.addAccount = function(cb) {
+    window.appHost.invoke('addAccount',{}, cb)
+  };
+
+
+  TestAPI.prototype.showAndHideLoading = function() {
+    window.appHost.invoke('showLoading', {"text": "loading..."});
+    setTimeout(function() {
+         window.appHost.invoke('hideLoading', {});
+      }, 2000);
+  };
+
+  TestAPI.prototype.copyToPasteboard = function() {
+    window.appHost.invoke('copyToPasteboard', {"text":"test text"});
+  };
+
+  TestAPI.prototype.getInitParam = function(cb) {
+    window.appHost.invoke('getInitParam', {}, cb);
+  };
+ 
+ TestAPI.prototype.getMasterCloudAccounts = function(cb) {
+     window.appHost.invoke('getMasterCloudAccounts', {}, cb);
+ };
+ 
+ TestAPI.prototype.addMasterCloudAccount = function(cb) {
+     window.appHost.invoke('addMasterCloudAccount', {}, cb);
+ };
+ 
+ TestAPI.prototype.autoLogin = function(account, accountType, cb) {
+     window.appHost.proxyInvoke('hd', 'autoLogin', {'account':account, 'accountType':accountType}, cb);
+ };
+
+
+  window.test = new TestAPI();
+
+
+})();
+</script>
+
+<script>
+(function() {
+  window.testShare = function(resultEle) {
+    window.test.share(
+      '打开专属邮件，领取神秘礼物，快来看看你能拿到什么礼物吧，我拿到的是感恩节特制火鸡哦，吃货福利棒棒哒',
+      '感恩节明星送好礼',
+      'http://www.baidu.com',
+      'http://img2.3lian.com/img2007/14/03/20080405141042587.png',
+      function(result){
+        resultEle.innerHTML = 'type: ' + result.type + '; result: ' + result.result;
+      }
+    );
+  };
+
+  window.testConfirm = function(resultEle) {
+    window.test.confirm(
+      'content',
+      'title',
+      'positive',
+      'negative',
+      function(result) {
+        resultEle.innerHTML = 'result: ' + result.result;
+      }
+    );
+  };
+
+  window.testGetAccounts = function(resultEle) {
+    window.test.getAccounts(function(result) {
+      resultEle.innerHTML = JSON.stringify(result.accounts);
+    });
+  };
+
+  window.testGetReceiveDate = function(resultEle) {
+    window.test.getReceiveDate(function(result) {
+      resultEle.innerHTML = JSON.stringify(result);
+    });
+  };
+
+  window.testGetBaseInfo = function(resultEle) {
+    window.test.getBaseInfo(function(result) {
+      resultEle.innerHTML = JSON.stringify(result);
+    });
+  };
+ 
+  window.testAddAccount = function(resultEle) {
+    window.test.addAccount(function(result) {
+      resultEle.innerHTML = JSON.stringify(result);
+    });
+  };
+  window.testSendMessage = function(resultEle) {
+    window.test.sendMessage("test", "test", function(result) {
+      resultEle.innerHTML = JSON.stringify(result);
+    });
+  };
+  window.testGetInitParam = function(resultEle) {
+    window.test.getInitParam(function(result) {
+      resultEle.innerHTML = JSON.stringify(result);
+    });
+  };
+ window.testGetMasterCloudAccounts = function(resultEle) {
+     window.test.getMasterCloudAccounts (function(result) {
+         resultEle.innerHTML = JSON.stringify(result);
+     });
+ };
+ window.testAddMasterCloudAccount = function(resultEle) {
+     window.test.addMasterCloudAccount (function(result) {
+         resultEle.innerHTML = JSON.stringify(result);
+     });
+ };
+ window.testAutoLogin = function(account, accountType, resultEle) {
+    window.test.autoLogin (account, accountType, function(result) {
+        resultEle.innerHTML = JSON.stringify(result);
+    });
+ };
+ 
+})();
+</script>
+</head><body><a href="javascript:window.test.alert(&#39;234&#39;);"> alert </a> <br>
+<a href="javascript:window.test.toast(&#39;123&#39;);"> toast </a> <br>
+<a href="javascript:window.test.openUrl(&#39;http://www.baidu.com&#39;);"> openUrl </a> <br>
+<a href="javascript:window.testConfirm(document.getElementById(&#39;confirmResult&#39;))"> confirm, </a> result is: <div id="confirmResult"></div> <br>
+<a href="javascript:window.test.startNewPage(&#39;http://www.baidu.com&#39;, &#39;title&#39;, &#39;push&#39;);"> startNewPage </a> <br>
+<a href="javascript:window.testShare(document.getElementById(&#39;shareResult&#39;));"> share </a>, result is: <div id="shareResult"></div>
+<a href="javascript:window.testGetAccounts(document.getElementById(&#39;getAccounts&#39;));"> getAccounts </a>, result is: <div id="getAccounts"></div>
+<a href="javascript:window.testAddAccount(document.getElementById(&#39;addAccount&#39;));"> addAccount </a>, result is: <div id="addAccount"></div>
+<a href="javascript:window.test.showAndHideLoading();"> showAndHideLoading</a> <br>
+<a href="javascript:window.test.copyToPasteboard();"> copyToPasteboard</a> <br>
+<a href="javascript:window.testSendMessage(document.getElementById(&#39;testSendMessageResult&#39;));"> sendMessage </a>, result is: <div id="testSendMessageResult"></div>
+<a href="javascript:window.testGetInitParam(document.getElementById(&#39;testGetInitParamResult&#39;));"> getInitParams </a>, result is: <div id="testGetInitParamResult"></div>
+<a href="javascript:window.testGetReceiveDate(document.getElementById(&#39;receiveDate&#39;))"> getReceiveDate </a> result is: <div id="receiveDate"></div> <br>
+<a href="javascript:window.testGetBaseInfo(document.getElementById(&#39;baseInfo&#39;));">getBaseInfo</a> result is: <div id="baseInfo"></div> <br>
+
+
+<a href="javascript:window.testGetMasterCloudAccounts(document.getElementById(&#39;testGetMasterCloudAccounts&#39;));"> getMasterCloudAccounts</a>, result is: <div id="testGetMasterCloudAccounts"></div>
+<a href="javascript:window.testAddMasterCloudAccount(document.getElementById(&#39;testAddMasterCloudAccount&#39;));"> addMasterCloudAccount</a>, result is: <div id="testAddMasterCloudAccount"></div><br>
+
+    autoLogin account:
+    <input id="autoLoginAccount" type="text" name="autoLoginAccount"><br>
+    
+<a href="javascript:window.testAutoLogin(document.getElementById(&#39;autoLoginAccount&#39;), &#39;Mail&#39;, document.getElementById(&#39;MailAutoLogin&#39;));"> mail autoLogin</a>, result is: <div id="MailAutoLogin"></div>
+<a href="javascript:window.testAutoLogin(document.getElementById(&#39;autoLoginAccount&#39;), &#39;MasterCloud&#39;, document.getElementById(&#39;MasterCloudAutoLogin&#39;));"> masterCloud autologin</a>, result is: <div id="MasterCloudAutoLogin"></div><br>
+
+
+
+</body></html>
